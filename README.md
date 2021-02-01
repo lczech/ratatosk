@@ -1,6 +1,16 @@
 ![ratatosk logo](/docs/logo/logo.png?raw=true)
 
-Snakemake pipeline for phylogenetic placement of metagenomic sequences
+Snakemake pipeline for phylogenetic placement of metagenomic sequences.
+
+**Advantages**:
+
+  - Takes care of the whole placement process
+  - Optimized for large datasets and cluster environments
+
+This pipeline is meant for worry-free single-stop placement.
+We recommend to use it in combination with the excellent
+[PEWO workflow](https://github.com/phylo42/PEWO),
+which determines the best tools and settings to be used prior to running ratatosk.
 
 Pipeline Overview
 -------------------
