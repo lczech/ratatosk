@@ -4,13 +4,14 @@ Snakemake pipeline for phylogenetic placement of metagenomic sequences.
 
 **Advantages**:
 
-  - Takes care of the whole placement process
-  - Optimized for large datasets and cluster environments
+  - Simplicity: Only expects your files (and settings), and runs everything for you.
+  - Interoperability: Takes care of file format compatibility between tools.
+  - Scalability: From single files to large datasets, also in cluster environments.
 
-This pipeline is meant for worry-free single-stop placement.
+This pipeline is meant for worry-free single-stop placement to run analyses on your data.
 We recommend to use it in combination with the excellent
-[PEWO workflow](https://github.com/phylo42/PEWO),
-which determines the best tools and settings to be used prior to running ratatosk.
+[PEWO workflow](https://github.com/phylo42/PEWO). PEWO determines the best tools and settings
+to be used for accurate placement &ndash; which you can then set in ratatosk to get the best quality.
 
 Pipeline Overview
 -------------------
@@ -26,6 +27,8 @@ Pipeline Overview
   - Aligning queries
     - ...
   - Placing queries
+    - ...
+  - Visualization
     - ...
 
 **Output:**
@@ -44,6 +47,8 @@ What's in a name?!
 -------------------
 
 In Norse mythology, Ratatosk, the drill-tooth, lives in the world-tree Yggdrasil,
-to which all of the Nine Worlds are linked. Like our mundane squirrels,
-Ratatosk enjoys whizzing through Yggdrasil’s many branches.
-He is regarded as a troublemaker, which we hope is a quality that is not reflected in our software.
+to which all of the Nine Worlds are connected. Like our mundane squirrels,
+Ratatosk enjoys whizzing through Yggdrasil’s many branches &ndash;
+which is also how phylogenetic placement algorithms operate!
+He is regarded as a troublemaker though,
+which we hope is a quality that is not reflected in our software.
