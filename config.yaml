@@ -1,0 +1,86 @@
+# =================================================================================================
+#     Input Data
+# =================================================================================================
+
+# Set the input data, using absolute file paths (relative paths do not work well with some
+# of the snakemake tools we are using in the pipeline, such as shadow directories).
+data:
+
+  # Select the input fasta sample files.
+  # Eiter a directory, from which all files ending in `.(fasta|fas|fsa|fna|ffn|faa|frn)[.gz]`
+  # are used, or a simple file that lists one file path to a sample file per line (in which case
+  # their ending does not matter - they are however assumed to be [compressed] fasta files).
+  # Paths in that file need to be absolute! No relative paths (e.g., `../data`)!
+  samples: "data/samples.tsv"
+
+  # Reference tree in newick format.
+  reference-tree: "data/reference.newick"
+
+  # Reference alignment, preferrably in fasta format, but currently, any format that is accepted
+  # by hmmbuild also works here.
+  reference-alignment: "data/reference.fasta"
+
+# =================================================================================================
+#     Pipeline Settings
+# =================================================================================================
+
+settings:
+
+  # Select the tool used for aligning queries to the reference alignment.
+  # Valid values: "hmmer"
+  alignment-tool: "hmmer"
+
+  # Select the tool used for phylogenetic placement.
+  # Valid values: "epa-ng"
+  placement-tool: "epa-ng"
+
+# =================================================================================================
+#     Tool Parameters
+# =================================================================================================
+
+params:
+
+  # ----------------------------------------------------------------------
+  #     hmmer
+  # ----------------------------------------------------------------------
+
+  # Used only if settings: alignment-tool == hmmer
+  # See hmmer manual: http://hmmer.org/documentation.html
+  hmmer:
+    threads: 1
+    build-extra: ""
+    align-extra: ""
+
+  # ----------------------------------------------------------------------
+  #     epa-ng
+  # ----------------------------------------------------------------------
+
+  # Used only if settings: placement-tool == epa-ng
+  # See epa-ng manual: https://github.com/Pbdas/epa-ng
+  epa-ng:
+    threads: 2
+
+    # If set to true, convet the reference alignment and tree to a binary file first.
+    # This step is only done once, and then speeds up all subsequent placement jobs.
+    # It is recommended to do this for large scale placement datasets.
+    binary: false
+
+    # Evolutionary model and its parameters to be used for the maximum likelihood placement.
+    # This can be given either as a string following the RAxML-ng model string specification:
+    #     GTR{0.7/1.8/1.2/0.6/3.0/1.0}+FU{0.25/0.23/0.30/0.22}+G4{0.47}
+    # or it can be a filename pointing to a RAxML-ng model file (`raxml.bestModel` file).
+    # It can also be empty (default), in which case RAxML-ng is executed to evaluate the tree and
+    # obtain the best fitting model, using the model as specified below at key `model`.
+    model-params: ""
+
+    # If the above key `model-params` is left empty, we run RAxML-ng to evaluate the reference tree
+    # to obtain the best fitting model parameters automatically. For this, we need the evolutionary
+    # model that was used to infer the tree in the first place (or at least is a reasonable model
+    # for the given reference dataset). The value given here is hence only used if `model-params`
+    # is empty, and only used to run RAxML-ng to evaluate the model parameters.
+    model: "GTR+G"
+
+    # Any extra parameters to be used with epa-ng. See their documentation for details.
+    # Make sure not do provide conflicting options (e.g., binary mode or model string)
+    # for the options that are already given above.
+    extra: ""
