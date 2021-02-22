@@ -6,10 +6,21 @@
 # of the snakemake tools we are using in the pipeline, such as shadow directories).
 data:
 
-  # Select the input fasta sample files.
-  # Eiter a directory, from which all files ending in `.(fasta|fas|fsa|fna|ffn|faa|frn)[.gz]`
-  # are used, or a simple file that lists one file path to a sample file per line (in which case
-  # their ending does not matter - they are however assumed to be [compressed] fasta files).
+  # Select the input fasta sample files (the "query sequences").
+  #
+  # Either a directory, from which all files ending in `.(fasta|fas|fsa|fna|ffn|faa|frn)[.gz]`
+  # are used;
+  #
+  #   OR
+  #
+  # A simple file that lists one file path to a sample file per line (in which case their ending
+  # does not matter - they are however assumed to be [compressed] fasta files).
+  # The lines can have one or two tab-separated columns.
+  #   - If one column, it needs to be the file path to the sample fasta path, and we use the file
+  #     base name (i.e., without directory and extension) as the sample name, which determines the
+  #     output jplace file name.
+  #   - If two columns, the first column is used as the sample name, and the second needs to be the
+  #     path to the sample fasta file itself.
   # Paths in that file need to be absolute! No relative paths (e.g., `../data`)!
   samples: "data/samples.tsv"
 
@@ -18,6 +29,8 @@ data:
 
   # Reference alignment, preferrably in fasta format, but currently, any format that is accepted
   # by hmmbuild also works here.
+  # TODO might need to change this once we allow for different alignment tools as well!
+  # Needs to contain the same sequences (by name) as the reference tree above.
   reference-alignment: "data/reference.fasta"
 
 # =================================================================================================
@@ -59,11 +72,6 @@ params:
   # See epa-ng manual: https://github.com/Pbdas/epa-ng
   epa-ng:
     threads: 2
-
-    # If set to true, convet the reference alignment and tree to a binary file first.
-    # This step is only done once, and then speeds up all subsequent placement jobs.
-    # It is recommended to do this for large scale placement datasets.
-    binary: false
 
     # Evolutionary model and its parameters to be used for the maximum likelihood placement.
     # This can be given either as a string following the RAxML-ng model string specification:
