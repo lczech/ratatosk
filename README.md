@@ -5,13 +5,14 @@ Snakemake pipeline for phylogenetic placement of metagenomic sequences.
 **Advantages**:
 
   - Simplicity: Only expects your files (and settings), and runs everything for you.
-  - Interoperability: Takes care of file format compatibility between tools.
-  - Scalability: From single files to large datasets, also in cluster environments.
+  - Interoperability: Takes care of file format (in)compatibility between tools.
+  - Scalability: Works from single files to large datasets, also in cluster environments.
 
 This pipeline is meant for worry-free single-stop placement to run analyses on your data.
 We recommend to use it in combination with the excellent
 [PEWO workflow](https://github.com/phylo42/PEWO). PEWO determines the best tools and settings
-to be used for accurate placement &ndash; which you can then set in ratatosk to get the best quality.
+to be used for accurate placement &ndash; which you can then set in ratatosk to get the best of
+both worlds: accurate and scalable placement.
 
 Pipeline Overview
 -------------------
