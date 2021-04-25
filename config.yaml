@@ -122,3 +122,26 @@ params:
     # Make sure not do provide conflicting options (e.g., binary mode or model string)
     # for the options that are already given above.
     extra: ""
+
+  # ----------------------------------------------------------------------
+  #     gappa
+  # ----------------------------------------------------------------------
+
+  gappa:
+
+    # Settings for making heat trees that visualize the resulting placement files.
+    # See https://github.com/lczech/gappa/wiki/Subcommand:-heat-tree for details.
+    heat-tree:
+
+      # Produce individual heat trees per sample (if True), or just one overview tree
+      # (if False - we always produce that overview tree that shows the placement distribution
+      # of all samples combined, because that is an important quality control tool).
+      sample-trees: False
+
+      # Image file formats to produce the heat trees in.
+      # List any of "newick", "nexus", "phyloxml", "svg".
+      formats:
+        - "svg"
+
+      # Any extra parameters. In particular useful to change color and svg settings.
+      extra: "--svg-tree-ladderize"

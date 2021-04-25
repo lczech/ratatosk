@@ -9,7 +9,9 @@ include: "rules/common.smk"
 # arrow shows up in the DAG that reminds us that this is an important intermediate file.
 rule all:
     input:
-        expand( "placed/{sample}.jplace", sample=samples.keys() )
+        expand( "placed/{sample}.jplace", sample=samples.keys() ),
+        expand("heat-tree.{ext}", ext=config["params"]["gappa"]["heat-tree"]["formats"]),
+        expand("heat-trees/{sample}.{ext}", sample=samples.keys(), ext=config["params"]["gappa"]["heat-tree"]["formats"]) if config["params"]["gappa"]["heat-tree"]["sample-trees"] else []
 
 # The main `all` rule is local. It does not do anything anyway,
 # except requesting the other rules to run.
@@ -37,3 +39,6 @@ if config["settings"]["placement-tool"] not in [ "epa-ng" ]:
 # Now use the tool choice to load the correct rules.
 include: "rules/align-" + config["settings"]["alignment-tool"] + "-" + run_mode + ".smk"
 include: "rules/place-" + config["settings"]["placement-tool"] + "-" + run_mode + ".smk"
+
+# Include additional rules.
+include: "rules/gappa-heat-tree.smk"
