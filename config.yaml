@@ -13,9 +13,9 @@ data:
   #
   #   OR
   #
-  # A simple file that lists one file path to a sample file per line (in which case their ending
-  # does not matter - they are however assumed to be [compressed] fasta files).
-  # The lines can have one or two tab-separated columns.
+  # A simple text file that lists one file path to a sample file per line (in which case their
+  # ending does not matter - they are however assumed to be [compressed] fasta files).
+  # The lines can have one or two tab-separated columns:
   #   - If one column, it needs to be the file path to the sample fasta path, and we use the file
   #     base name (i.e., without directory and extension) as the sample name, which determines the
   #     output jplace file name.
@@ -39,6 +39,13 @@ data:
 
 settings:
 
+  # If set to True, we automagically run chunkify/unchunkify on the input sample fasta files.
+  # That is, we de-duplicate query sequences and re-distribute their workload to minimize cluster
+  # execution times and maximize load balance. This is recommended for large-scale projects with
+  # many samples of similar diveristy.
+  # See https://github.com/lczech/gappa/wiki/Subcommand:-chunkify for details.
+  use-chunkify: True
+
   # Select the tool used for aligning queries to the reference alignment.
   # Valid values: "hmmer"
   alignment-tool: "hmmer"
@@ -52,6 +59,29 @@ settings:
 # =================================================================================================
 
 params:
+
+  # ----------------------------------------------------------------------
+  #     chunkify / unchunkify
+  # ----------------------------------------------------------------------
+
+  # Used only if settings: use-chunkify == True
+  # See https://github.com/lczech/gappa/wiki/Subcommand:-chunkify for details
+  chunkify:
+    # Hash function to use when hashing sequences to find duplicates.
+    # Valid values: "SHA1", "SHA256", "MD5"
+    hash-function: "SHA1"
+
+    # Chunkify. Minimum abundance of a single sequence. Sequences below are filtered out.
+    min-abundance: 1
+
+    # Chunkify. Number of sequences per chunk file.
+    chunk-size: 100000
+
+    # Unchunkify. Cache size to determine how many jplace files are kept in memory.
+    # Default (0) means all. Set this to a number greater than 0 (~100k maybe, depending on
+    # the available main mamory) if the command runs out of memory.
+    # See https://github.com/lczech/gappa/wiki/Subcommand:-unchunkify for details.
+    jplace-cache-size: 0
 
   # ----------------------------------------------------------------------
   #     hmmer

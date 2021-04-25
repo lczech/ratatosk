@@ -19,5 +19,21 @@ localrules: all
 #     Rule Modules
 # =================================================================================================
 
-include: "rules/align-hmmer.smk"
-include: "rules/place-epa-ng.smk"
+# Based on the config file, we include certain rule files, for individual tools,
+# and for the overall workflow (simple placement, or with chunkify).
+if config["settings"]["use-chunkify"]:
+    include: "rules/chunkify.smk"
+    run_mode = "chunked"
+else:
+    run_mode = "simple"
+
+# Make sure that the config fits our expectations.
+# This might already be checked by the scheme anyway, but let's be safe.
+if config["settings"]["alignment-tool"] not in [ "hmmer" ]:
+    raise Exception("Unknown alignment-tool: " + config["settings"]["alignment-tool"])
+if config["settings"]["placement-tool"] not in [ "epa-ng" ]:
+    raise Exception("Unknown placement-tool: " + config["settings"]["placement-tool"])
+
+# Now use the tool choice to load the correct rules.
+include: "rules/align-" + config["settings"]["alignment-tool"] + "-" + run_mode + ".smk"
+include: "rules/place-" + config["settings"]["placement-tool"] + "-" + run_mode + ".smk"

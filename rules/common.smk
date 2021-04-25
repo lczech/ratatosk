@@ -26,7 +26,7 @@ configfile: "config.yaml"
 # =================================================================================================
 
 # Prepare regex for all sample files that we are looking for.
-regex = re.compile("([^/\\\\]*)\\.(fasta|fas|fsa|fna|ffn|faa|frn)(\\.gz)?$")
+regex = re.compile("([^/\\\\]*)\\.(fasta|fas|fsa|fna|ffn|faa|frn|fs)(\\.gz)?$")
 
 # Prepare a dictionary of samples, from name (used for our wildcards here, and hence for file
 # naming within the pipeline) to absolute file paths.
@@ -65,14 +65,15 @@ elif os.path.isfile( config["data"]["samples"] ):
                 # might be different. Instead, we filter by common file types that we expect - and
                 # everything else will just be left as is.
                 sample = os.path.basename(line.strip())
-                sample = re.sub('\\.gz$', '', sample)
+                sample = re.sub('\\.gz$',    '', sample)
                 sample = re.sub('\\.fasta$', '', sample)
-                sample = re.sub('\\.fas$', '', sample)
-                sample = re.sub('\\.fsa$', '', sample)
-                sample = re.sub('\\.fna$', '', sample)
-                sample = re.sub('\\.ffn$', '', sample)
-                sample = re.sub('\\.faa$', '', sample)
-                sample = re.sub('\\.frn$', '', sample)
+                sample = re.sub('\\.fas$',   '', sample)
+                sample = re.sub('\\.fsa$',   '', sample)
+                sample = re.sub('\\.fna$',   '', sample)
+                sample = re.sub('\\.ffn$',   '', sample)
+                sample = re.sub('\\.faa$',   '', sample)
+                sample = re.sub('\\.frn$',   '', sample)
+                sample = re.sub('\\.fs$',    '', sample)
                 path = os.path.realpath(line.strip())
                 add_sample( sample, path )
 
@@ -121,3 +122,11 @@ logger.info("")
 def get_sample_fasta(wildcards):
     """Get fasta file for a given sample"""
     return samples[wildcards.sample]
+
+def get_all_sample_names():
+    """Get the samples names given to all fasta files"""
+    return list(samples.keys())
+
+def get_all_sample_paths():
+    """Get the paths to all fasta files"""
+    return list(samples.values())
