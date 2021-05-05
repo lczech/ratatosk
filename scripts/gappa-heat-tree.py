@@ -21,7 +21,13 @@ out = None
 for file in snakemake.output:
     ext = os.path.splitext( file )[1][1:]
     exts.append(ext)
-    if not out:
+    if out:
+        if out != file[: -(len(ext) + 1)]:
+            raise Exception(
+                "Output file paths for different file types in gappa heat-tree rule have to "
+                "be identical except for their file extension."
+            )
+    else:
         out = file[: -(len(ext) + 1)]
 
 # Create command line arguments and check that the extensions are valid.
