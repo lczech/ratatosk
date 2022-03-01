@@ -6,22 +6,8 @@
 # of the snakemake tools we are using in the pipeline, such as shadow directories).
 data:
 
-  # Select the input fasta sample files (the "query sequences").
-  #
-  # Either a directory, from which all files ending in `.(fasta|fas|fsa|fna|ffn|faa|frn)[.gz]`
-  # are used;
-  #
-  #   OR
-  #
-  # A simple text file that lists one file path to a sample file per line (in which case their
-  # ending does not matter - they are however assumed to be [compressed] fasta files).
-  # The lines can have one or two tab-separated columns:
-  #   - If one column, it needs to be the file path to the sample fasta path, and we use the file
-  #     base name (i.e., without directory and extension) as the sample name, which determines the
-  #     output jplace file name.
-  #   - If two columns, the first column is used as the sample name, and the second needs to be the
-  #     path to the sample fasta file itself.
-  # Paths in that file need to be absolute! No relative paths (e.g., `../data`)!
+  # Table of input files. Must contain the header "sample\tinput_file"
+  # This file can contain per-sample paths to fasta/fastq files containing the query sequences
   samples: "data/samples.tsv"
 
   # Reference tree in newick format.
@@ -39,6 +25,8 @@ data:
 
 settings:
 
+  datatype: "nt" # 'nt' for DNA, 'aa' for protein
+
   # If set to True, we automagically run chunkify/unchunkify on the input sample fasta files.
   # That is, we de-duplicate query sequences and re-distribute their workload to minimize cluster
   # execution times and maximize load balance. This is recommended for large-scale projects with
@@ -53,6 +41,8 @@ settings:
   # Select the tool used for phylogenetic placement.
   # Valid values: "epa-ng"
   placement-tool: "epa-ng"
+
+  outdir: "test"
 
 # =================================================================================================
 #     Tool Parameters
@@ -93,6 +83,15 @@ params:
     threads: 1
     build-extra: ""
     align-extra: ""
+
+
+  # ----------------------------------------------------------------------
+  #     raxml-ng
+  # ----------------------------------------------------------------------
+
+  raxml-ng:
+    extra: ""
+
 
   # ----------------------------------------------------------------------
   #     epa-ng
@@ -145,3 +144,12 @@ params:
 
       # Any extra parameters. In particular useful to change color and svg settings.
       extra: "--svg-tree-ladderize"
+
+  # ----------------------------------------------------------------------
+  #     guppy
+  # ----------------------------------------------------------------------
+
+  guppy:
+    fpd:
+      include-pendant: False
+      extra: ""

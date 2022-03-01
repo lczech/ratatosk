@@ -9,10 +9,23 @@ include: "rules/common.smk"
 # arrow shows up in the DAG that reminds us that this is an important intermediate file.
 rule all:
     input:
-        expand( "placed/{sample}.jplace", sample=samples.keys() ),
-        expand("heat-tree.{ext}", ext=config["params"]["gappa"]["heat-tree"]["formats"]),
-        expand("heat-trees/{sample}.{ext}", sample=samples.keys(), ext=config["params"]["gappa"]["heat-tree"]["formats"]) if config["params"]["gappa"]["heat-tree"]["sample-trees"] else []
-
+        expand("{outdir}/placed/{sample}.jplace",
+            outdir=outdir,
+            sample=sample_names
+        ),
+        expand("{outdir}/heat-tree.{ext}",
+            outdir=outdir,
+            ext=config["params"]["gappa"]["heat-tree"]["formats"]
+        ),
+        expand("{outdir}/heat-trees/{sample}.{ext}",
+            outdir=outdir,
+            sample=sample_names,
+            ext=config["params"]["gappa"]["heat-tree"]["formats"]
+        ) if config["params"]["gappa"]["heat-tree"]["sample-trees"] else [],
+        expand("{outdir}/diversity/guppy/{sample}.csv",
+            outdir=outdir,
+            sample=sample_names
+        )
 # The main `all` rule is local. It does not do anything anyway,
 # except requesting the other rules to run.
 localrules: all
@@ -42,3 +55,4 @@ include: "rules/place-" + config["settings"]["placement-tool"] + "-" + run_mode 
 
 # Include additional rules.
 include: "rules/gappa-heat-tree.smk"
+include: "rules/diversity.smk"

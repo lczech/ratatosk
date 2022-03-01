@@ -3,4 +3,4 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - gappa ==0.7.1
+  - gappa ==0.8.0

@@ -2,5 +2,4 @@
 channels:
   - bioconda
 dependencies:
-  - raxml-ng
-  # - raxml-ng ==1.0.1
+  - raxml-ng ==1.1.0
