@@ -5,13 +5,16 @@
 # Rule to create a heat tree visualization for all samples combined
 rule gappa_heat_tree_all:
     input:
-        expand( "placed/{sample}.jplace", sample=samples.keys() )
+        expand("{outdir}/placed/{sample}.jplace", outdir=outdir, sample=sample_names )
     output:
-        expand("heat-tree.{ext}", ext=config["params"]["gappa"]["heat-tree"]["formats"])
+        expand("{outdir}/heat-tree.{ext}",
+            outdir=outdir,
+            ext=config["params"]["gappa"]["heat-tree"]["formats"]
+            )
     params:
         extra=config["params"]["gappa"]["heat-tree"]["extra"],
-    log:
-        "logs/gappa/heat_tree_all.log"
+    # log:
+    #     "{outdir}/logs/gappa/heat_tree_all.log"
     conda:
         "../envs/gappa.yaml"
     script:
@@ -20,13 +23,16 @@ rule gappa_heat_tree_all:
 # Rule to create individual heat tree visualizations per sample
 rule gappa_heat_tree:
     input:
-        "placed/{sample}.jplace"
+        "{outdir}/placed/{sample}.jplace"
     output:
-        expand("heat-trees/{{sample}}.{ext}", ext=config["params"]["gappa"]["heat-tree"]["formats"])
+        expand("{outdir}/heat-trees/{{sample}}.{ext}",
+            outdir=outdir,
+            ext=config["params"]["gappa"]["heat-tree"]["formats"]
+            )
     params:
         extra=config["params"]["gappa"]["heat-tree"]["extra"],
-    log:
-        "logs/gappa/heat_trees/{sample}.log"
+    # log:
+    #     "{outdir}/logs/gappa/heat_trees/{sample}.log"
     conda:
         "../envs/gappa.yaml"
     script:

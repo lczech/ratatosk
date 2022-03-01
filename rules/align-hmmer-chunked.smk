@@ -10,21 +10,26 @@ include: "align-hmmer-common.smk"
 
 rule hmmer_align:
     input:
-        msa = config["data"]["reference-alignment"],
-        hmmprofile = "hmmer/profile.hmm",
-        sample="chunkify/chunks/{sample}.fasta"
+        msa         = config["data"]["reference-alignment"],
+        hmmprofile  = "{outdir}/hmmer/profile.hmm",
+        sample      = "{outdir}/chunkify/chunks/{sample}.fasta"
     output:
-        sequences = "chunkify/aligned/{sample}.fasta"
+        sequences   = "{outdir}/chunkify/aligned/{sample}.afa"
     params:
-        extra=config["params"]["hmmer"]["align-extra"],
-
-        # states = ["dna"] if config["states"] == 0 else ["amino"]
-        states = "dna"
+        extra       = config["params"]["hmmer"]["align-extra"],
+        states      = hmmer_datatype_string
     log:
-        "logs/align/{sample}.log"
+        "{outdir}/logs/align/{sample}.log"
     conda:
         "../envs/hmmer.yaml"
     threads:
-        config["params"]["hmmer"]["threads"]
-    script:
-        "../scripts/hmmer.py"
+        get_highest_override( "hmmer", "threads" )
+    shell:
+        "hmmalign"
+        " --{params.states}"
+        " --outformat afa"
+        " -o {output.sequences}"
+        " --mapali {input.msa}"
+        " {params.extra} {input.hmmprofile} {input.sample}"
+        " > {log} 2>&1"
+

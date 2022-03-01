@@ -12,7 +12,7 @@ rule chunkify_sample_prep:
     input:
         fasta=get_sample_fasta
     output:
-        "chunkify/samples/{sample}.fasta"
+        "{outdir}/chunkify/samples/{sample}.fasta"
     shell:
         "ln -s {input.fasta} {output}"
 
@@ -25,31 +25,33 @@ localrules: chunkify_sample_prep
 checkpoint chunkify:
     input:
         # Request renamed samples, using the rule above, to get chunkify to use proper sample names.
-        expand( "chunkify/samples/{sample}.fasta", sample=samples.keys() )
-        # get_all_sample_paths()
+        expand( "{outdir}/chunkify/samples/{sample}.fasta", outdir=outdir, sample=sample_names )
     output:
-        chunks = directory("chunkify/chunks"),
-        # abundances = directory("chunkify/abundances")
-        abundances = expand("chunkify/abundances/abundances_{sample}.json", sample=samples.keys())
+        abundances      = expand(   "{outdir}/chunkify/abundances/abundances_{sample}.json",
+                                    outdir=outdir,
+                                    sample=sample_names
+                                )
     params:
-        hashfunction = config["params"]["chunkify"]["hash-function"],
-        minabun = config["params"]["chunkify"]["min-abundance"],
-        chunksize = config["params"]["chunkify"]["chunk-size"]
-    log:
-        "logs/chunkify.log"
+        chunks_dir      = directory("{outdir}/chunkify/chunks"),
+        abundances_dir  = directory("{outdir}/chunkify/abundances"),
+        hashfunction    = config["params"]["chunkify"]["hash-function"],
+        minabun         = config["params"]["chunkify"]["min-abundance"],
+        chunksize       = config["params"]["chunkify"]["chunk-size"]
+    # log:
+    #     "{outdir}/logs/chunkify.log"
     conda:
         "../envs/gappa.yaml"
     shell:
-        "mkdir -p chunkify/chunks ; "
-        "mkdir -p chunkify/abundances ; "
-        "gappa prepare chunkify "
-        "--fasta-path {input} "
-        "--chunks-out-dir chunkify/chunks "
-        "--abundances-out-dir chunkify/abundances "
-        "--hash-function {params.hashfunction} "
-        "--min-abundance {params.minabun} "
-        "--chunk-size {params.chunksize} "
-        "> {log} 2>&1"
+        "mkdir -p {params.chunks_dir} ;"
+        " mkdir -p {params.abundances_dir} ;"
+        " gappa prepare chunkify"
+        " --fasta-path {input}"
+        " --chunks-out-dir {params.chunks_dir}"
+        " --abundances-out-dir {params.abundances_dir}"
+        " --hash-function {params.hashfunction}"
+        " --min-abundance {params.minabun}"
+        " --chunk-size {params.chunksize}"
+        " > {log} 2>&1"
 
 # Following the documentation tutorial here:
 # https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#data-dependent-conditional-execution
@@ -68,19 +70,19 @@ def aggregate_chunkify_chunks(wildcards):
 rule unchunkify:
     input:
         aggregate_chunkify_chunks,
-        expand("chunkify/abundances/abundances_{sample}.json", sample=samples.keys())
+        expand("{outdir}/chunkify/abundances/abundances_{sample}.json", outdir=outdir, sample=sample_names)
     output:
-        protected( expand( "placed/{sample}.jplace", sample=samples.keys() ))
+        protected( expand( "{outdir}/placed/{sample}.jplace", outdir=outdir, sample=sample_names ))
     params:
-        hashfunction = config["params"]["chunkify"]["hash-function"]
-    log:
-        "logs/unchunkify.log"
+        hash_function = config["params"]["chunkify"]["hash-function"]
+    # log:
+    #     "{outdir}/logs/unchunkify.log"
     conda:
         "../envs/gappa.yaml"
     shell:
-        "gappa prepare unchunkify "
-        "--abundances-path chunkify/abundances "
-        "--chunk-file-expression chunkify/placed/chunk_@.jplace " # TODO nope
-        "--hash-function {params.hashfunction} "
-        "--out-dir placed"
-        "> {log} 2>&1"
+        "gappa prepare unchunkify"
+        " --abundances-path {outdir}/chunkify/abundances"
+        " --chunk-file-expression {outdir}/chunkify/placed/chunk_@.jplace"
+        " --hash-function {params.hash_function}"
+        " --out-dir {outdir}/placed"
+        " > {log} 2>&1"

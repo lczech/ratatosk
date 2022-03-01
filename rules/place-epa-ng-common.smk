@@ -1,5 +1,3 @@
-import os
-
 # =================================================================================================
 #     Auxilliary Rules and Functions
 # =================================================================================================
@@ -11,20 +9,23 @@ rule raxml_ng_model_eval:
         tree = config["data"]["reference-tree"],
         msa = config["data"]["reference-alignment"]
     output:
-        "model/model_eval.raxml.bestModel"
+        "{outdir}/model/model_eval.raxml.bestModel"
     params:
         model = config["params"]["epa-ng"]["model"]
     log:
-        "logs/model/model_eval.log"
+        "{outdir}/logs/model/model_eval.log"
+    threads:
+        get_highest_override( "raxml-ng", "threads" )
     conda:
         "../envs/raxml-ng.yaml"
     shell:
-        "raxml-ng --evaluate "
-        "--msa {input.msa} "
-        "--tree {input.tree} "
-        "--model {params.model} "
-        "--prefix model/model_eval "
-        "> {log} 2>&1"
+        "raxml-ng --evaluate"
+        " --msa {input.msa}"
+        " --tree {input.tree}"
+        " --model {params.model}"
+        " --prefix model/model_eval"
+        " --threads {threads}"
+        " > {log} 2>&1"
 
 # epa-ng expects a model of evolution to be given either as a string (such as the model
 # string used in raxml-ng), or as a file (such as the best model output file of raxml-ng).
@@ -39,7 +40,7 @@ rule raxml_ng_model_eval:
 def epa_ng_place_model( context ):
     if config["params"]["epa-ng"]["model-params"] == "":
         # Use the raxml best model file
-        inp = "model/model_eval.raxml.bestModel"
+        inp = "{outdir}/model/model_eval.raxml.bestModel"
         prm = ""
     elif os.path.isfile( config["params"]["epa-ng"]["model-params"] ):
         # Use the provided file
@@ -57,5 +58,4 @@ def epa_ng_place_model( context ):
     elif context == "params":
         return prm
     else:
-        print("Invalid epa_ng_place_model context: " + context )
-        sys.exit(1)
+        util.fail( "Invalid epa_ng_place_model context: " + context )

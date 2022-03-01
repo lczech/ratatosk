@@ -4,20 +4,18 @@
 
 rule hmmer_build:
     input:
-        msa = config["data"]["reference-alignment"]
+        config["data"]["reference-alignment"]
     output:
-        hmmprofile = "hmmer/profile.hmm"
+        "{outdir}/hmmer/profile.hmm"
     params:
-        extra=config["params"]["hmmer"]["build-extra"],
-        # TODO allow different types of states, also below at align step
-        # states = ["dna"] if config["states"] == 0 else ["amino"]
-        states = "dna"
+        extra   = config["params"]["hmmer"]["build-extra"],
+        states  = hmmer_datatype_string
     log:
-        "logs/hmmer/hmmer_build.log"
+        "{outdir}/logs/hmmer/hmmer_build.log"
     threads:
-        1
+        get_highest_override( "hmmer", "threads" )
     conda:
         "../envs/hmmer.yaml"
     shell:
         "hmmbuild --cpu {threads} --{params.states} {params.extra} "
-        "{output.hmmprofile} {input.msa} > {log} 2>&1"
+        "{output} {input} > {log} 2>&1"
